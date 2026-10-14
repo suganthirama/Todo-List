@@ -1,6 +1,6 @@
 
 
-function Todo() {
+function TodoList() {
     const todoList= [
         {id:1, title: "Learn React"},
         {id:2, title: "Build a Project"},
@@ -13,4 +13,4 @@ function Todo() {
     )
 }
 
-export default Todo
+export default TodoList
