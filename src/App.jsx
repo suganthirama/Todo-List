@@ -13,7 +13,7 @@ function App() {
             title: todoTitle,
         };
         setTodoList(previous => [newTodo, ...previous])
-        console.log(todoTitle, typeof todoTitle)
+   
     }
     return (
         <div>
