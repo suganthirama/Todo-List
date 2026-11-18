@@ -1,9 +1,8 @@
 
 
 import { useState, useRef} from 'react';
-// import TodoListItem from "../features/TodoList/TodoListItem.jsx";
-import TextInputWithLabel from "../shared/TextInputWithLabel.jsx";
-import { isValidTodoTitle } from '../utils/todoValidation';
+import TextInputWithLabel from "../../shared/TextInputWithLabel.jsx";
+import { isValidTodoTitle } from '../../utils/todoValidation.js';
 
 
 function TodoForm({onAddTodo}) {
@@ -13,9 +12,12 @@ function TodoForm({onAddTodo}) {
 
     const handleAddTodo = (event) => {
         event.preventDefault();
-        onAddTodo(workingTodoTitle);
+        onAddTodo({
+            title: workingTodoTitle,
+            isCompleted: false
+        });
         setWorkingTodoTitle('');
-    }
+    };
 
     return (
         <form onSubmit={handleAddTodo}>
