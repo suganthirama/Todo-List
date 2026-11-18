@@ -9,12 +9,18 @@ function TodosPage({ token }) {
     const [isTodoListLoading, setIsTodoListLoading] = useState(false);
 
 
+
     async function fetchTodos() {
         setIsTodoListLoading(true);
         setError('');
 
         try {
-            const response = await fetch('/api/tasks', {
+            const params = new URLSearchParams({
+                page: '0',
+                limit: '99',
+            });
+
+            const response = await fetch(`/api/tasks?${params.toString()}`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
@@ -32,6 +38,7 @@ function TodosPage({ token }) {
             }
 
             const data = await response.json();
+
             setTodoList(data.tasks);
 
         } catch (error) {
@@ -40,6 +47,7 @@ function TodosPage({ token }) {
             setIsTodoListLoading(false);
         }
     }
+
 
     // Fetch todos when token becomes available or changes
     useEffect(() => {
