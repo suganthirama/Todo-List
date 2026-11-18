@@ -1,11 +1,52 @@
-import TodoList from './TodoList/TodoList.jsx'
-import TodoForm from './TodoForm.jsx'
+
+import TodoList from './TodoList/TodoList.jsx';
+import TodoForm from './TodoForm.jsx';
 import { useState, useEffect } from 'react';
 
 function TodosPage({ token }) {
     const [todoList, setTodoList] = useState([]);
     const [error, setError] = useState('');
     const [isTodoListLoading, setIsTodoListLoading] = useState(false);
+
+
+    async function fetchTodos() {
+        setIsTodoListLoading(true);
+        setError('');
+
+        try {
+            const response = await fetch('/api/tasks', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': token,
+                },
+                credentials: 'include',
+            });
+
+            if (response.status === 401) {
+                throw new Error('Unauthorized. Please log in again.');
+            }
+
+            if (!response.ok) {
+                throw new Error('Failed to fetch todos');
+            }
+
+            const data = await response.json();
+            setTodoList(data.tasks);
+
+        } catch (error) {
+            setError(`Error fetching todos: ${error.message}`);
+        } finally {
+            setIsTodoListLoading(false);
+        }
+    }
+
+    // Fetch todos when token becomes available or changes
+    useEffect(() => {
+        if (token) {
+            fetchTodos();
+        }
+    }, [token]);
 
     async function addTodo(newTodo) {
         const temporaryTodo = {
@@ -56,7 +97,6 @@ function TodosPage({ token }) {
         }
     }
 
-
     async function completeTodo(id) {
         const originalTodo = todoList.find(
             (todo) => todo.id === id
@@ -67,7 +107,7 @@ function TodosPage({ token }) {
         setTodoList((currentTodos) =>
             currentTodos.map((todo) =>
                 todo.id === id
-                    ? {...todo, isCompleted: true}
+                    ? { ...todo, isCompleted: true }
                     : todo
             )
         );
@@ -98,7 +138,6 @@ function TodosPage({ token }) {
             setError(`Error completing todo: ${error.message}`);
         }
     }
-
 
     async function updateTodo(editedTodo) {
         const originalTodo = todoList.find(
@@ -131,19 +170,12 @@ function TodosPage({ token }) {
                     }),
                 }
             );
+
             if (!response.ok) {
                 const errorDetails = await response.text();
-
-                console.error('API Error:', {
-                    status: response.status,
-                    statusText: response.statusText,
-                    details: errorDetails
-                });
-                throw new Error(errorDetails || 'Failed to add todo');
+                throw new Error(errorDetails || 'Failed to update todo');
             }
-            // if (!response.ok) {
-            //     throw new Error('Failed to update todo');
-            // }
+
         } catch (error) {
             setTodoList((currentTodos) =>
                 currentTodos.map((todo) =>
@@ -171,12 +203,18 @@ function TodosPage({ token }) {
             {isTodoListLoading && (
                 <p>Loading todos...</p>
             )}
+
             <div>
-                <h1>My Todos</h1>
-                <TodoForm onAddTodo={addTodo}/>
-                <TodoList todoList={todoList} onCompleteTodo={completeTodo} onUpdateTodo={updateTodo}/>
+                {/*<h1>My Todos</h1>*/}
+                <TodoForm onAddTodo={addTodo} />
+                <TodoList
+                    todoList={todoList}
+                    onCompleteTodo={completeTodo}
+                    onUpdateTodo={updateTodo}
+                />
             </div>
         </>
     );
 }
-export default TodosPage
+
+export default TodosPage;
